@@ -1,0 +1,111 @@
+<title>Account Signal Scorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: tick boxes on the left; the account's score, tier and this week's play on the right. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#0f1b2d; --muted:#5b6778; --line:#d5dbe3;
+  --signal:#d9861c; --signal-soft:#fbe9cf; --steel:#2f5d8a; --good:#2e7d5b; --bad:#b4442f;
+  --display:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif; --body:"IBM Plex Sans","Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b111b;--surface:#121a27;--ink:#e8edf4;--muted:#93a0b2;--line:#243043;--signal:#f0a645;--signal-soft:#3a2a12;--steel:#7fb0e0;--good:#5cc495;--bad:#ef7b64;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b111b;--surface:#121a27;--ink:#e8edf4;--muted:#93a0b2;--line:#243043;--signal:#f0a645;--signal-soft:#3a2a12;--steel:#7fb0e0;--good:#5cc495;--bad:#ef7b64;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding-block:28px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,4vw,44px);letter-spacing:-1px;line-height:1.02;margin:8px 0 6px}
+.sub{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.preset{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:6px 14px;font:inherit;font-size:13.5px;cursor:pointer}
+.preset:hover{border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.panel{background:var(--surface);border:1.5px solid var(--ink);border-radius:10px;padding:22px;min-width:0}
+.panel h2{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 10px}
+.tick{display:grid;grid-template-columns:22px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.tick:first-of-type{border-top:0}
+.tick input{width:18px;height:18px;accent-color:var(--signal);margin:0}
+.tick .pts{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.tick:has(input:checked) .pts{color:var(--signal);font-weight:500}
+.gap{height:14px}
+.score{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.score b{font-family:var(--display);font-size:72px;line-height:1;letter-spacing:-2px}
+.tier{font-family:var(--mono);font-size:13px;padding:4px 12px;border-radius:99px;font-weight:500}
+.t1{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.t2{background:var(--signal-soft);color:var(--signal)}
+.t3{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
+.tx{background:var(--line);color:var(--muted)}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--line);margin:16px 0 6px}
+.bar i{display:block;height:100%;border-right:2px solid var(--surface)}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.play{margin-top:20px}
+.play h3{font-family:var(--display);font-size:22px;margin:0 0 8px;letter-spacing:-.4px}
+.play ul{margin:0;padding-left:18px}
+.play li{margin:4px 0}
+.line{margin-top:18px;background:var(--bg);border-left:3px solid var(--signal);padding:12px 14px;font-size:14.5px}
+.line .k{font-family:var(--mono);font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
+.foot{margin-top:18px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Lyzr Task C · Q2 extra · by Vansh Agicha</div>
+  <h1>Account Signal Scorer</h1>
+  <p class="sub">Tick what you know about one company. You get its score, its tier, and exactly what sales and marketing should do this week. No typing.</p>
+  <div class="presets"><span class="eyebrow" style="align-self:center;margin-right:4px">Try</span>
+    <button class="preset" data-p="bank" type="button">A large bank with a new Head of AI</button>
+    <button class="preset" data-p="bpo" type="button">An operations firm on two agent stacks</button>
+    <button class="preset" data-p="cold" type="button">A good fit, no signals yet</button>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <h2>Fit (both needed)</h2>
+      <label class="tick"><input type="checkbox" id="f1"><span>1,000+ employees</span><span class="pts">gate</span></label>
+      <label class="tick"><input type="checkbox" id="f2"><span>Banking, insurance, telecom, healthcare or IT services</span><span class="pts">gate</span></label>
+      <div class="gap"></div>
+      <h2>Signals this quarter</h2>
+      <div id="sigs"></div>
+    </div>
+    <div class="panel" aria-live="polite">
+      <div class="score"><b id="score">0</b><span class="tier tx" id="tier">Not a target yet</span></div>
+      <div class="bar" id="bar"></div>
+      <div class="scale"><span>0</span><span>40 · Tier 2</span><span>70 · Tier 1</span><span>100+</span></div>
+      <div class="play"><h3 id="playTitle"></h3><ul id="playList"></ul></div>
+      <div class="line" id="lineBox" hidden><span class="k">Suggested first line</span><span id="line"></span></div>
+      <p class="foot">Starting weights. After 4 weeks of meeting grades, they get re-weighted by what actually led to A and B meetings.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const S=[
+  {id:'hire',t:'Hired a Head of AI, AI governance or agent ops role',p:25,c:'#b4442f',line:"Saw {{company}} brought in a Head of AI. The first 90 days of that job usually go on one question: how many agents already exist?"},
+  {id:'earn',t:'Leadership talked about AI agents publicly',p:20,c:'#d9861c',line:"Your CEO told investors agents are a priority this year. Who's making sure they stay governed?"},
+  {id:'stack',t:'Uses 2+ agent stacks (Agentforce, Copilot Studio, Bedrock, LangChain)',p:20,c:'#2f5d8a',line:"Looks like {{company}} builds on more than one agent stack. Most teams in that spot can't see both in one place."},
+  {id:'gsi',t:'A GSI partner already works with them',p:15,c:'#2e7d5b',line:"Our partners at {{gsi}} mentioned your agent programme. Would a 15-minute look at governance help?"},
+  {id:'visit',t:'Visited pricing, Opencontroller or Test Drive pages',p:15,c:'#7a5cc4',line:"Rather than a demo, would it help to test drive an agent on one of {{company}}'s real workflows?"},
+  {id:'reg',t:'New regulator guidance on AI in their sector',p:15,c:'#8a6d3b',line:"With the new guidance on AI in your sector, auditors will ask who owns each agent. Is that mapped yet?"},
+  {id:'eng',t:'Engaged with founder posts or document ads',p:10,c:'#6b7a8f',line:"You read our agent audit checklist. Want the 2-minute version scored for {{company}}?"}
+];
+const P={bank:{f1:1,f2:1,hire:1,earn:1,reg:1,visit:1},bpo:{f1:1,f2:1,stack:1,gsi:1},cold:{f1:1,f2:1}};
+const el=id=>document.getElementById(id);
+el('sigs').innerHTML=S.map(s=>`<label class="tick"><input type="checkbox" id="${s.id}"><span>${s.t}</span><span class="pts">+${s.p}</span></label>`).join('');
+function calc(){
+  const fit=el('f1').checked&&el('f2').checked;
+  const on=S.filter(s=>el(s.id).checked); const sc=on.reduce((a,s)=>a+s.p,0);
+  el('score').textContent=fit?sc:0;
+  el('bar').innerHTML=fit?on.map(s=>`<i style="width:${Math.min(s.p,100)}%;background:${s.c}" title="${s.t}: +${s.p}"></i>`).join(''):'';
+  const t=el('tier'); let title,list;
+  if(!fit){t.className='tier tx';t.textContent='Not a target yet';title='Outside the fit gate';list=['No SDR time and no ad spend.','Revisit if the company grows or moves into a target industry.'];}
+  else if(sc>=70){t.className='tier t1';t.textContent='Tier 1';title='Personal treatment this week';list=['Record a 30-second video naming the company and its likely agent stack.','Contact 3 to 4 people at once: CIO, Head of AI, CISO, VP Engineering.','Invite to the next CIO dinner. Ask a GSI partner for a warm intro.'];}
+  else if(sc>=40){t.className='tier t2';t.textContent='Tier 2';title='Signal sequence plus ads';list=['Start the 3-step Apollo sequence, opening with the strongest signal.','Add to LinkedIn layer 2 retargeting with the matching creative.','Move to Tier 1 the moment one more signal appears.'];}
+  else {t.className='tier t3';t.textContent='Tier 3';title='Useful ads only';list=['Layer 1 document ads and founder posts. No SDR time yet.','Watch for a hire, a public mention or a site visit.'];}
+  el('playTitle').textContent=title; el('playList').innerHTML=list.map(x=>`<li>${x}</li>`).join('');
+  const top=on.sort((a,b)=>b.p-a.p)[0];
+  if(fit&&top){el('lineBox').hidden=false;el('line').textContent=top.line;} else el('lineBox').hidden=true;
+}
+document.querySelectorAll('input').forEach(i=>i.addEventListener('change',calc));
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{const p=P[b.dataset.p];document.querySelectorAll('input').forEach(i=>i.checked=!!p[i.id]);calc();}));
+document.querySelector('.preset[data-p="bank"]').click();
+</script>
